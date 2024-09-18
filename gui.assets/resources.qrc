@@ -1,0 +1,6 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="mathjax">
+      <file alias="3.2.2">mathjax.zip</file>
+    </qresource>
+</RCC>
