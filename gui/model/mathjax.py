@@ -17,7 +17,6 @@ class MathjaxModel(QObject):
             QStandardPaths.StandardLocation.AppDataLocation
         )[0]
         mathjax_dir: str = str(Path(app_data_dir).joinpath("mathjax"))
-        print(mathjax_dir)
         qd: QDir = QDir()
 
         # check if mathjax exists

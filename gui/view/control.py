@@ -109,7 +109,6 @@ class ControlView(QGroupBox):
 
     @Slot()
     def __paste_handler(self) -> None:
-        print("hello control")
         if not self.__infer_view_model.available.get():
             return
         if self.__clipboard.mimeData().hasImage():
