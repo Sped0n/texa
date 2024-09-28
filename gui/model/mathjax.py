@@ -4,7 +4,7 @@ from shutil import unpack_archive
 from PySide6.QtCore import QDir, QFile, QIODevice, QObject, QStandardPaths, QUrl
 
 
-class Mathjax(QObject):
+class MathjaxModel(QObject):
     def __init__(self, version: str, parent: QObject | None = None) -> None:
         # super init
         super().__init__(parent)
@@ -59,7 +59,7 @@ class Mathjax(QObject):
             artifact.remove()
 
         # base url
-        self.__base_url: QUrl = QUrl.fromLocalFile(mathjax_dir)
+        self.__base_url: QUrl = QUrl.fromLocalFile(mathjax_dir + "/")
 
     @property
     def base_url(self) -> QUrl:

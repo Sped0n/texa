@@ -1,13 +1,15 @@
 [project]
-name = "texify"
+name = "texa"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "markdown>=3.7",
+    "pillow>=10.4.0",
     "pyside6>=6.7.2",
-    "result>=0.17.0",
-    "texify",
+    "texify>=0.1.10",
+    "pymdown-extensions>=10.11",
 ]
 
 [tool.pyright]
@@ -19,6 +21,3 @@ reportMissingTypeStubs = false
 
 [tool.ruff.lint]
 extend-select = ["I", "N", "PERF", "UP"]
-
-[tool.uv.sources]
-texify = { workspace = true }
