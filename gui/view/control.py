@@ -1,16 +1,17 @@
-from PySide6.QtCore import QStandardPaths, Qt, Slot
+from PySide6.QtCore import QStandardPaths, Slot
 from PySide6.QtGui import QClipboard, QImage, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
+    QComboBox,
     QFileDialog,
     QGroupBox,
     QHBoxLayout,
     QLabel,
     QPushButton,
-    QSlider,
     QVBoxLayout,
     QWidget,
 )
 
+from gui.annotations import InferMode
 from gui.viewmodel.infer import InferViewModel
 
 
@@ -40,33 +41,28 @@ class ControlView(QGroupBox):
         self.__clipboard: QClipboard = QClipboard()
 
         # widgets
-        self.__tempretature_label: QLabel = QLabel("Temperature:")
-        self.__tempreature_slider: QSlider = QSlider(Qt.Orientation.Horizontal)
+        self.__mode_label: QLabel = QLabel("Mode")
+        self.__mode_combobox: QComboBox = QComboBox()
         self.__ocr_from_file_button: QPushButton = QPushButton("OCR from file")
         self.__rerun_button: QPushButton = QPushButton("Rerun")
 
         # widgets setup
-        self.__tempreature_slider.setRange(0, 10)
-        self.__tempreature_slider.setSingleStep(1)
-        self.__tempreature_slider.setValue(2)
-        self.__tempreature_slider.setTickInterval(1)
-        self.__infer_view_model.set_temperature(0.2)
-        self.__tempreature_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
-        self.__tempreature_slider.setEnabled(False)
+        self.__mode_combobox.addItems(["Text and Formula", "Text Only", "Formula Only"])
+        self.__mode_combobox.setCurrentIndex(0)
         self.__ocr_from_file_button.setEnabled(False)
         self.__rerun_button.setEnabled(False)
 
         # effects
         self.__infer_view_model.available.changed.connect(self.__available_handler)
-        self.__tempreature_slider.valueChanged.connect(self.__tempreature_handler)
         self.__ocr_from_file_button.clicked.connect(self.__ocr_from_file_handler)
+        self.__mode_combobox.currentIndexChanged.connect(self.__mode_index_handler)
         self.__shortcut.activated.connect(self.__paste_handler)
         self.__rerun_button.clicked.connect(self.__rerun_handler)
 
         # layout
         temp_layout: QHBoxLayout = QHBoxLayout()
-        temp_layout.addWidget(self.__tempretature_label, 1)
-        temp_layout.addWidget(self.__tempreature_slider, 3)
+        temp_layout.addWidget(self.__mode_label, 1)
+        temp_layout.addWidget(self.__mode_combobox, 4)
         layout: QVBoxLayout = QVBoxLayout()
         layout.addLayout(temp_layout)
         layout.addWidget(self.__ocr_from_file_button)
@@ -75,13 +71,23 @@ class ControlView(QGroupBox):
 
     @Slot(bool)
     def __available_handler(self, available: bool) -> None:
-        self.__tempreature_slider.setEnabled(available)
+        self.__mode_combobox.setEnabled(available)
         self.__ocr_from_file_button.setEnabled(available)
         self.__rerun_button.setEnabled(available)
 
     @Slot(int)
-    def __tempreature_handler(self, value: int) -> None:
-        self.__infer_view_model.set_temperature(value / 10)
+    def __mode_index_handler(self, index: int) -> None:
+        mode: InferMode | None = None
+        match index:
+            case 0:
+                mode = "text_and_formula"
+            case 1:
+                mode = "text_only"
+            case 2:
+                mode = "formula_only"
+            case _:
+                return
+        self.__infer_view_model.set_mode(mode)
 
     @Slot()
     def __ocr_from_file_handler(self) -> None:
