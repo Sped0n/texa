@@ -1,9 +1,19 @@
+import os
 from functools import partial
+from pathlib import Path
 from queue import Empty, Queue
 from threading import Event
 
 from PIL import ImageQt
-from PySide6.QtCore import QObject, QThread, QTimer, Signal, SignalInstance, Slot
+from PySide6.QtCore import (
+    QObject,
+    QStandardPaths,
+    QThread,
+    QTimer,
+    Signal,
+    SignalInstance,
+    Slot,
+)
 
 from gui.annotations import InferRequest
 
@@ -26,6 +36,13 @@ class _P2tWroker(QObject):
         # variables
         self.__stop: Event = Event()
         self.__queue: Queue[InferRequest] = Queue(3)
+
+        # for matplotlib
+        app_data_dir: str = QStandardPaths.standardLocations(
+            QStandardPaths.StandardLocation.AppDataLocation
+        )[0]
+        mpl_config_dir: str = str(Path(app_data_dir).joinpath("mpl"))
+        os.environ["MPLCONFIGDIR"] = mpl_config_dir
 
         # effects
         self.__conn1 = self.__request.connect(partial(self.__request_handler))
