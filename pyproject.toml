@@ -21,3 +21,6 @@ reportMissingTypeStubs = false
 
 [tool.ruff.lint]
 extend-select = ["I", "N", "PERF", "UP"]
+
+[tool.uv]
+dev-dependencies = ["pyinstaller>=6.10.0"]
