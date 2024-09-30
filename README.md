@@ -15,4 +15,4 @@ For Unix, run `make pyinstaller` to generate the app
 
 For Windows, run the command under `pyinstaller:` in `Makefile` to generate the app
 
-> _App release will not be provided due to the large bundle size_
+> _App release will be limited due to the large bundle size_
