@@ -5,11 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "markdown>=3.7",
-    "pillow>=10.4.0",
-    "pyside6>=6.7.2",
-    "texify>=0.1.10",
-    "pymdown-extensions>=10.11",
+  "markdown>=3.7",
+  "pillow>=10.4.0",
+  "pyside6>=6.7.2",
+  "pymdown-extensions>=10.11",
+  "pix2text>=1.1.1.2",
 ]
 
 [tool.pyright]

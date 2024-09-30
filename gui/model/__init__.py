@@ -1,9 +1,10 @@
 from PySide6.QtCore import Slot
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
 import gui.resources
 from gui.model.mathjax import MathjaxModel
-from gui.model.txf import TxfModel
+from gui.model.p2t import P2tModel
 
 
 class Model:
@@ -21,17 +22,20 @@ class Model:
 
         # models
         self.mathjax_model: MathjaxModel = MathjaxModel("3.2.2")
-        self.txf_model: TxfModel = TxfModel()
+        self.p2t_model: P2tModel = P2tModel()
 
         # effects
         self.__app.aboutToQuit.connect(self.__quit_handler)
+
+        # setup
+        self.__app.setWindowIcon(QIcon(":/images/icon"))
 
     @Slot()
     def __quit_handler(self) -> None:
         """
         Quit the application.
         """
-        self.txf_model.stop()
+        self.p2t_model.stop()
 
     def run(self) -> None:
         """

@@ -1,21 +1,14 @@
 from functools import partial
 from queue import Empty, Queue
 from threading import Event
-from typing import Any
 
 from PIL import ImageQt
 from PySide6.QtCore import QObject, QThread, QTimer, Signal, SignalInstance, Slot
-from texify.inference import (
-    batch_inference,  # pyright: ignore[reportUnknownVariableType]
-)
-from texify.model.model import load_model
-from texify.model.processor import VariableDonutProcessor, load_processor
-from transformers import PreTrainedModel
 
 from gui.annotations import InferRequest
 
 
-class _TxfWroker(QObject):
+class _P2tWroker(QObject):
     def __init__(
         self,
         request: SignalInstance,
@@ -42,23 +35,25 @@ class _TxfWroker(QObject):
         self.__queue.put(data)
 
     def run(self) -> None:
-        # load model and processor
-        model: PreTrainedModel = load_model()
-        processor: (  # pyright: ignore[reportUnknownVariableType]
-            tuple[VariableDonutProcessor, dict[str, Any]] | VariableDonutProcessor
-        ) = load_processor()
+        # load the ocr engine
+        from pix2text import Pix2Text
+
+        p2t = Pix2Text()
         self.__loaded.emit(True)
 
         # inference loop
         while not self.__stop.wait(0.1):
             try:
                 request: InferRequest = self.__queue.get(timeout=0.1)
-                result: str = batch_inference(
-                    [ImageQt.fromqimage(request.image).convert("RGB")],
-                    model,  # pyright: ignore[reportUnknownArgumentType]
-                    processor,  # pyright: ignore[reportUnknownArgumentType]
-                    request.tempreature,
-                )[0]
+                image = ImageQt.fromqimage(request.image).convert("RGB")
+                result: str | None = None
+                match request.mode:
+                    case "text_and_formula":
+                        result = str(p2t.recognize_text_formula(image, line_sep="\n\n"))
+                    case "text_only":
+                        result = str(p2t.recognize_text(image))
+                    case "formula_only":
+                        result = str(p2t.recognize_formula(image))
                 self.__output.emit(result)
             except Empty:
                 pass
@@ -70,7 +65,7 @@ class _TxfWroker(QObject):
         self.__stop.set()
 
 
-class TxfModel(QObject):
+class P2tModel(QObject):
     request: Signal = Signal(InferRequest)
     output: Signal = Signal(str)
     loaded: Signal = Signal(bool)
@@ -80,18 +75,18 @@ class TxfModel(QObject):
         super().__init__(parent)
 
         # variables
-        self.__worker: _TxfWroker | None = None
+        self.__worker: _P2tWroker | None = None
         self.__thread: QThread | None = None
         self.__loaded_state: bool = False
 
         # don't spin up worker immediately
-        QTimer.singleShot(300, self.__start_worker)
+        QTimer.singleShot(500, self.__start_worker)
 
         # effects
         self.loaded.connect(self.__loaded_handler)
 
     def __start_worker(self) -> None:
-        self.__worker = _TxfWroker(self.request, self.output, self.loaded)  # pyright: ignore[reportUnknownArgumentType]
+        self.__worker = _P2tWroker(self.request, self.output, self.loaded)  # pyright: ignore[reportUnknownArgumentType]
         self.__thread = QThread()
         self.__worker.moveToThread(self.__thread)
         self.__thread.started.connect(self.__worker.run)
