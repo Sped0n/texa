@@ -10,6 +10,7 @@ dependencies = [
   "pyside6>=6.7.2",
   "pymdown-extensions>=10.11",
   "pix2text>=1.1.1.2",
+  "onnx==1.16.1",
 ]
 
 [tool.pyright]
