@@ -1,3 +1,4 @@
+import gc
 import os
 from functools import partial
 from pathlib import Path
@@ -55,12 +56,14 @@ class _P2tWroker(QObject):
         # load the ocr engine
         from pix2text import Pix2Text
 
-        p2t = Pix2Text()
+        p2t: Pix2Text | None = None
         self.__loaded.emit(True)
 
         # inference loop
         while not self.__stop.wait(0.1):
             try:
+                if p2t is None:
+                    p2t = Pix2Text()
                 request: InferRequest = self.__queue.get(timeout=0.1)
                 image = ImageQt.fromqimage(request.image).convert("RGB")
                 result: str | None = None
@@ -72,6 +75,9 @@ class _P2tWroker(QObject):
                     case "formula_only":
                         result = str(p2t.recognize_formula(image))
                 self.__output.emit(result)
+                del p2t
+                p2t = None
+                gc.collect()
             except Empty:
                 pass
 
