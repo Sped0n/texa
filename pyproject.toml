@@ -23,4 +23,7 @@ reportMissingTypeStubs = false
 extend-select = ["I", "N", "PERF", "UP"]
 
 [tool.uv]
-dev-dependencies = ["pyinstaller>=6.10.0"]
+dev-dependencies = [
+    "pyinstaller>=6.10.0",
+    "scalene>=1.5.44.1",
+]
