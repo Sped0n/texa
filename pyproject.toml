@@ -10,6 +10,7 @@ dependencies = [
   "pyside6>=6.7.2",
   "pymdown-extensions>=10.11",
   "pix2text>=1.1.1.2",
+  "onnx==1.16.1",
 ]
 
 [tool.pyright]
@@ -23,4 +24,7 @@ reportMissingTypeStubs = false
 extend-select = ["I", "N", "PERF", "UP"]
 
 [tool.uv]
-dev-dependencies = ["pyinstaller>=6.10.0"]
+dev-dependencies = [
+    "pyinstaller>=6.10.0",
+    "scalene>=1.5.44.1",
+]
