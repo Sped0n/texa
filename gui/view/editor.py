@@ -82,6 +82,7 @@ class EditorView(QGroupBox):
     @Slot()
     def __copy_button_clicked(self) -> None:
         QClipboard().setText(self.__text_edit.toPlainText())
+        self.__mdtex_view_model.copied.emit()
 
     @Slot()
     def __clear_button_clicked(self) -> None:

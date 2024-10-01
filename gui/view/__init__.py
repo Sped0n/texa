@@ -27,7 +27,9 @@ class View(QMainWindow):
         self.__editor: EditorView = EditorView(
             view_model.infer_view_model, view_model.mdtex_view_model
         )
-        self.__stausbar: StatusBarView = StatusBarView(view_model.infer_view_model)
+        self.__stausbar: StatusBarView = StatusBarView(
+            view_model.infer_view_model, view_model.mdtex_view_model
+        )
 
         # setup
         self.setWindowTitle("Texa")
