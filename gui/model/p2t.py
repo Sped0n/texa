@@ -10,7 +10,6 @@ from PySide6.QtCore import (
     QObject,
     QStandardPaths,
     QThread,
-    QTimer,
     Signal,
     SignalInstance,
     Slot,
@@ -102,11 +101,11 @@ class P2tModel(QObject):
         self.__thread: QThread | None = None
         self.__loaded_state: bool = False
 
-        # don't spin up worker immediately
-        QTimer.singleShot(500, self.__start_worker)
-
         # effects
         self.loaded.connect(self.__loaded_handler)
+
+        # setup
+        self.__start_worker()
 
     def __start_worker(self) -> None:
         self.__worker = _P2tWroker(self.request, self.output, self.loaded)  # pyright: ignore[reportUnknownArgumentType]
