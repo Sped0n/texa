@@ -246,9 +246,9 @@ class _P2tWroker(QObject):
                 continue
             try:
                 if p2t is None:
-                    print({"text_formula": self.__cfg.model_dump(exclude_none=True)})
                     p2t = Pix2Text.from_config(
-                        {"text_formula": self.__cfg.model_dump(exclude_none=True)}
+                        {"text_formula": self.__cfg.model_dump(exclude_none=True)},
+                        enable_table=False,
                     )
                 image = ImageQt.fromqimage(request.image).convert("RGB")
                 result: str | None = None
