@@ -18,8 +18,15 @@ from PySide6.QtCore import (
     SignalInstance,
     Slot,
 )
+from result import Err, Ok, Result
 
-from gui.annotations import Cfg, CfgFormulaNode, CfgMfdNode, CfgTextNode, InferRequest
+from gui.annotations import (
+    Cfg,
+    CfgFormulaNode,
+    CfgMfdNode,
+    CfgTextNode,
+    InferRequest,
+)
 
 
 class _P2tConfig(QObject):
@@ -237,21 +244,25 @@ class _P2tWroker(QObject):
                 request: InferRequest = self.__queue.get(timeout=0.1)
             except Empty:
                 continue
-            if p2t is None:
-                print({"text_formula": self.__cfg.model_dump(exclude_none=True)})
-                p2t = Pix2Text.from_config(
-                    {"text_formula": self.__cfg.model_dump(exclude_none=True)}
-                )
-            image = ImageQt.fromqimage(request.image).convert("RGB")
-            result: str | None = None
-            match request.mode:
-                case "text_and_formula":
-                    result = str(p2t.recognize_text_formula(image, line_sep="\n\n"))
-                case "text_only":
-                    result = str(p2t.recognize_text(image))
-                case "formula_only":
-                    result = str(p2t.recognize_formula(image))
-            self.__output.emit(result)
+            try:
+                if p2t is None:
+                    print({"text_formula": self.__cfg.model_dump(exclude_none=True)})
+                    p2t = Pix2Text.from_config(
+                        {"text_formula": self.__cfg.model_dump(exclude_none=True)}
+                    )
+                image = ImageQt.fromqimage(request.image).convert("RGB")
+                result: str | None = None
+                match request.mode:
+                    case "text_and_formula":
+                        result = str(p2t.recognize_text_formula(image, line_sep="\n\n"))
+                    case "text_only":
+                        result = str(p2t.recognize_text(image))
+                    case "formula_only":
+                        result = str(p2t.recognize_formula(image))
+                self.__output.emit(Ok(result))
+            except Exception as e:
+                print("exception here: ", str(e))
+                self.__output.emit(Err(str(e)))
             del p2t
             p2t = None
             gc.collect()
@@ -266,7 +277,7 @@ class _P2tWroker(QObject):
 
 class P2tModel(QObject):
     request: Signal = Signal(InferRequest)
-    output: Signal = Signal(str)
+    output: Signal = Signal(type(Result[str, str]))
     loaded: Signal = Signal(bool)
 
     config: _P2tConfig = _P2tConfig()

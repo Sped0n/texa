@@ -1,8 +1,10 @@
 from PySide6.QtCore import QObject, Signal, Slot
 from PySide6.QtGui import QImage
+from result import Err, Result
 
 from gui.annotations import InferMode, InferRequest
 from gui.model.p2t import P2tModel
+from gui.utils import WarnMessageBox
 
 
 class _Available(QObject):
@@ -56,10 +58,16 @@ class InferViewModel(QObject):
     def __p2t_loaded_handler(self, loaded: bool) -> None:
         self.available.set_model_loaded(loaded)
 
-    @Slot(str)
-    def __p2t_output_handler(self, data: str) -> None:
-        self.result.emit(data)
+    @Slot(type(Result[str, str]))
+    def __p2t_output_handler(self, data: Result[str, str]) -> None:
         self.available.set_busy(False)
+        if isinstance(data, Err):
+            print(data.err_value)
+            warn_box = WarnMessageBox(data.err_value)
+            self.result.emit("$$\\color{red}\\text{Inference  Error}$$")
+            warn_box.exec()
+        else:
+            self.result.emit(data.ok_value)
 
     def set_mode(self, mode: InferMode) -> None:
         self.__mode = mode
