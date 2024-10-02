@@ -62,7 +62,6 @@ class InferViewModel(QObject):
     def __p2t_output_handler(self, data: Result[str, str]) -> None:
         self.available.set_busy(False)
         if isinstance(data, Err):
-            print(data.err_value)
             warn_box = WarnMessageBox(data.err_value)
             self.result.emit("$$\\color{red}\\text{Inference  Error}$$")
             warn_box.exec()

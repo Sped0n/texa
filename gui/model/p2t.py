@@ -136,7 +136,6 @@ class _P2tConfig(QObject):
         for file_info in from_dir.entryInfoList(
             QDir.Filter.Files | QDir.Filter.NoDotAndDotDot
         ):
-            print(file_info.absoluteFilePath())
             file = QFile(file_info.absoluteFilePath())
             file.copy(Path(target_dir.absolutePath()).joinpath(file_info.fileName()))
         # update config
@@ -261,7 +260,6 @@ class _P2tWroker(QObject):
                         result = str(p2t.recognize_formula(image))
                 self.__output.emit(Ok(result))
             except Exception as e:
-                print("exception here: ", str(e))
                 self.__output.emit(Err(str(e)))
             del p2t
             p2t = None
