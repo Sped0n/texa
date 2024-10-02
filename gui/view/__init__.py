@@ -34,7 +34,7 @@ class View(QMainWindow):
 
         # setup
         self.setWindowTitle("Texa")
-        self.setMinimumSize(1000, 700)
+        self.setMinimumSize(900, 600)
         self.setStatusBar(self.__stausbar)
         self.setWindowIcon(QIcon(":/images/icon"))
 
@@ -42,10 +42,10 @@ class View(QMainWindow):
         layout: QGridLayout = QGridLayout()
         layout.addWidget(self.__paste, 0, 0, 5, 3)
         layout.addWidget(self.__render, 0, 3, 5, 3)
-        layout.addWidget(self.__control, 5, 0, 3, 2)
-        layout.addWidget(self.__config, 8, 0, 1, 2)
-        layout.addWidget(self.__editor, 5, 2, 4, 4)
-        layout.setVerticalSpacing(20)
+        layout.addWidget(self.__control, 5, 0, 2, 2)
+        layout.addWidget(self.__config, 7, 0, 1, 2)
+        layout.addWidget(self.__editor, 5, 2, 3, 4)
+        layout.setVerticalSpacing(15)
         self.setCentralWidget(QWidget())
         self.centralWidget().setLayout(layout)
 
