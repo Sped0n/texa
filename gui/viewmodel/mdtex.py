@@ -5,6 +5,7 @@ from gui.model.mathjax import MathjaxModel
 
 class MDTeXViewModel(QObject):
     markdown: Signal = Signal(str)
+    copied: Signal = Signal()
 
     def __init__(
         self,

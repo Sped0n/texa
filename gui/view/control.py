@@ -45,6 +45,7 @@ class ControlView(QGroupBox):
         self.__mode_combobox: QComboBox = QComboBox()
         self.__ocr_from_file_button: QPushButton = QPushButton("OCR from file")
         self.__rerun_button: QPushButton = QPushButton("Rerun")
+        self.__config_button: QPushButton = QPushButton("Configuration")
 
         # widgets setup
         self.__mode_combobox.addItems(["Text and Formula", "Text Only", "Formula Only"])
