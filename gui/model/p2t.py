@@ -257,7 +257,7 @@ class _P2tWroker(QObject):
                     case "text_only":
                         result = str(p2t.recognize_text(image))
                     case "formula_only":
-                        result = str(p2t.recognize_formula(image))
+                        result = "$$\n" + str(p2t.recognize_formula(image)) + "\n$$"
                 self.__output.emit(Ok(result))
             except Exception as e:
                 self.__output.emit(Err(str(e)))
