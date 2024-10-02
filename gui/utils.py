@@ -13,4 +13,6 @@ class WarnMessageBox(QMessageBox):
         self.setStandardButtons(QMessageBox.StandardButton.Ok)
         self.setWindowIcon(QIcon(":/images/icon"))
         self.setOption(QMessageBox.Option.DontUseNativeDialog)
-        self.setInformativeText("text")
+        self.setInformativeText(text)
+        self.resize(200, 150)
+        self.setStyleSheet("font-size: 14px;")
