@@ -60,6 +60,8 @@ class View(QMainWindow):
         confirmation.setIcon(QMessageBox.Icon.Question)
         confirmation.setWindowIcon(QIcon(":/images/icon"))
         confirmation.setOption(QMessageBox.Option.DontUseNativeDialog)
+        confirmation.resize(200, 150)
+        confirmation.setStyleSheet("font-size: 14px;")
         if confirmation.exec() == QMessageBox.StandardButton.Yes:
             event.accept()
         else:
