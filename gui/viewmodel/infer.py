@@ -41,6 +41,7 @@ class InferViewModel(QObject):
 
         # references
         self.__p2t_model: P2tModel = p2t_model
+        self.p2t_config = self.__p2t_model.config
 
         # variables
         self.available.set_model_loaded(self.__p2t_model.is_loaded())
