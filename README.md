@@ -1,6 +1,6 @@
 # Texa
 
-![image-20241001024150033](README.assets/image-20241001024150033.png)
+![image-20241003220832072](README.assets/image-20241003220832072.png)
 
 A cross-plaform GUI wrapper for [Pix2Text](https://github.com/breezedeus/Pix2Text), powered by PySide6
 
@@ -8,6 +8,7 @@ A cross-plaform GUI wrapper for [Pix2Text](https://github.com/breezedeus/Pix2Tex
 
 - Realtime LaTeX rendering with [MathJax](https://www.mathjax.org)
 - Support input from file or clipboard (use the paste keyboard shortcut based on your operating system)
+- Basic model management, can import customized or purchased pro model
 
 ## Installation
 
