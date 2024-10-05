@@ -232,9 +232,12 @@ class _P2tWroker(QObject):
 
     def run(self) -> None:
         # load the ocr engine
-        from pix2text import Pix2Text
+        from texify.inference import batch_inference
+        from texify.model.model import load_model
+        from texify.model.processor import load_processor
 
-        p2t: Pix2Text | None = None
+        model = load_model()
+        processor = None
         self.__loaded.emit(True)
 
         # inference loop
@@ -244,25 +247,15 @@ class _P2tWroker(QObject):
             except Empty:
                 continue
             try:
-                if p2t is None:
-                    p2t = Pix2Text.from_config(
-                        {"text_formula": self.__cfg.model_dump(exclude_none=True)},
-                        enable_table=False,
-                    )
+                if processor is None:
+                    processor = load_processor()
                 image = ImageQt.fromqimage(request.image).convert("RGB")
-                result: str | None = None
-                match request.mode:
-                    case "text_and_formula":
-                        result = str(p2t.recognize_text_formula(image, line_sep="\n\n"))
-                    case "text_only":
-                        result = str(p2t.recognize_text(image))
-                    case "formula_only":
-                        result = "$$\n" + str(p2t.recognize_formula(image)) + "\n$$"
+                result: str = batch_inference([image], model, processor)[0]
                 self.__output.emit(Ok(result))
             except Exception as e:
                 self.__output.emit(Err(str(e)))
-            del p2t
-            p2t = None
+            del processor
+            processor = None
             gc.collect()
 
         # disconnect

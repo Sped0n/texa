@@ -9,10 +9,10 @@ dependencies = [
   "pillow>=10.4.0",
   "pyside6==6.7.3",
   "pymdown-extensions>=10.11",
-  "pix2text>=1.1.1.2",
   "onnx==1.16.1",
   "pydantic>=2.9.2",
   "result>=0.17.0",
+  "texify>=0.1.10",
 ]
 
 [tool.pyright]
@@ -27,6 +27,7 @@ extend-select = ["I", "N", "PERF", "UP"]
 
 [tool.uv]
 dev-dependencies = [
-    "pyinstaller>=6.10.0",
-    "scalene>=1.5.44.1",
+  "memray>=1.14.0",
+  "pyinstaller>=6.10.0",
+  "scalene>=1.5.44.1",
 ]
