@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from gui.utils import is_backend_available
 from gui.viewmodel.infer import InferViewModel
 from gui.viewmodel.mdtex import MDTeXViewModel
 
@@ -90,7 +91,7 @@ class EditorView(QGroupBox):
 
     @Slot(QImage)
     def __paste_handler(self, data: QImage) -> None:
-        if not self.__infer_view_model.available.get():
+        if not is_backend_available(self.__infer_view_model.state.get()):
             return
         self.__infer_view_model.set_image(data)
         self.__infer_view_model.infer()

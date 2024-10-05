@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QApplication
 
 import gui.resources
 from gui.model.mathjax import MathjaxModel
-from gui.model.p2t import P2tModel
+from gui.model.txf import TxfModel
 
 
 class Model:
@@ -22,7 +22,7 @@ class Model:
 
         # models
         self.mathjax_model: MathjaxModel = MathjaxModel("3.2.2")
-        self.p2t_model: P2tModel = P2tModel()
+        self.txf_model: TxfModel = TxfModel()
 
         # effects
         self.__app.aboutToQuit.connect(self.__quit_handler)
@@ -35,7 +35,7 @@ class Model:
         """
         Quit the application.
         """
-        self.p2t_model.stop()
+        self.txf_model.stop()
 
     def run(self) -> None:
         """

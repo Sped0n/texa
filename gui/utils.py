@@ -1,5 +1,15 @@
+from typing import Literal
+
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QMessageBox
+
+AppState = Literal[
+    "Initializing", "Initialization failed", "Ready", "Inferencing", "Inference failed"
+]
+
+
+def is_backend_available(state: AppState) -> bool:
+    return state == "Ready" or state == "Inference failed"
 
 
 class WarnMessageBox(QMessageBox):

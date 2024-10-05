@@ -9,10 +9,8 @@ dependencies = [
   "pillow>=10.4.0",
   "pyside6==6.7.3",
   "pymdown-extensions>=10.11",
-  "onnx==1.16.1",
-  "pydantic>=2.9.2",
   "result>=0.17.0",
-  "texify>=0.1.10",
+  "optimum[onnxruntime]>=1.22.0",
 ]
 
 [tool.pyright]

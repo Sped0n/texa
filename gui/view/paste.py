@@ -2,6 +2,7 @@ from PySide6.QtCore import QSize, Qt, Slot
 from PySide6.QtGui import QColor, QImage, QPainter, QPaintEvent, QPixmap
 from PySide6.QtWidgets import QGroupBox, QVBoxLayout, QWidget
 
+from gui.utils import AppState
 from gui.viewmodel.infer import InferViewModel
 
 
@@ -59,15 +60,13 @@ class PasteView(QGroupBox):
 
         # effects
         self.__infer_view_model.image.connect(self.__image_widget.setImage)
-        self.__infer_view_model.available.changed.connect(
-            self.__infer_view_model_available_changed_handler
-        )
+        self.__infer_view_model.state.changed.connect(self.__state_handler)
 
         # layout
         layout: QVBoxLayout = QVBoxLayout()
         layout.addWidget(self.__image_widget)
         self.setLayout(layout)
 
-    @Slot(bool)
-    def __infer_view_model_available_changed_handler(self, available: bool) -> None:
-        self.__image_widget.setGray(not available)
+    @Slot(str)
+    def __state_handler(self, data: AppState) -> None:
+        self.__image_widget.setGray(data == "Inferencing")

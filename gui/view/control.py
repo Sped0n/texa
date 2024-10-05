@@ -1,17 +1,14 @@
 from PySide6.QtCore import QStandardPaths, Slot
 from PySide6.QtGui import QClipboard, QImage, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
-    QComboBox,
     QFileDialog,
     QGroupBox,
-    QHBoxLayout,
-    QLabel,
     QPushButton,
     QVBoxLayout,
     QWidget,
 )
 
-from gui.annotations import InferMode
+from gui.utils import AppState, is_backend_available
 from gui.viewmodel.infer import InferViewModel
 
 
@@ -41,54 +38,29 @@ class ControlView(QGroupBox):
         self.__clipboard: QClipboard = QClipboard()
 
         # widgets
-        self.__mode_label: QLabel = QLabel("Mode")
-        self.__mode_combobox: QComboBox = QComboBox()
         self.__ocr_from_file_button: QPushButton = QPushButton("OCR from file")
         self.__rerun_button: QPushButton = QPushButton("Rerun")
-        self.__config_button: QPushButton = QPushButton("Configuration")
 
         # widgets setup
-        self.__mode_combobox.addItems(["Text and Formula", "Text Only", "Formula Only"])
-        self.__mode_combobox.setCurrentIndex(0)
-        self.__ocr_from_file_button.setEnabled(False)
-        self.__rerun_button.setEnabled(False)
+        self.__state_handler(self.__infer_view_model.state.get())
 
         # effects
-        self.__infer_view_model.available.changed.connect(self.__available_handler)
+        self.__infer_view_model.state.changed.connect(self.__state_handler)
         self.__ocr_from_file_button.clicked.connect(self.__ocr_from_file_handler)
-        self.__mode_combobox.currentIndexChanged.connect(self.__mode_index_handler)
         self.__shortcut.activated.connect(self.__paste_handler)
         self.__rerun_button.clicked.connect(self.__rerun_handler)
 
         # layout
-        temp_layout: QHBoxLayout = QHBoxLayout()
-        temp_layout.addWidget(self.__mode_label, 1)
-        temp_layout.addWidget(self.__mode_combobox, 4)
         layout: QVBoxLayout = QVBoxLayout()
-        layout.addLayout(temp_layout)
         layout.addWidget(self.__ocr_from_file_button)
         layout.addWidget(self.__rerun_button)
         self.setLayout(layout)
 
-    @Slot(bool)
-    def __available_handler(self, available: bool) -> None:
-        self.__mode_combobox.setEnabled(available)
-        self.__ocr_from_file_button.setEnabled(available)
-        self.__rerun_button.setEnabled(available)
-
-    @Slot(int)
-    def __mode_index_handler(self, index: int) -> None:
-        mode: InferMode | None = None
-        match index:
-            case 0:
-                mode = "text_and_formula"
-            case 1:
-                mode = "text_only"
-            case 2:
-                mode = "formula_only"
-            case _:
-                return
-        self.__infer_view_model.set_mode(mode)
+    @Slot(str)
+    def __state_handler(self, data: AppState) -> None:
+        flag: bool = is_backend_available(data)
+        self.__ocr_from_file_button.setEnabled(flag)
+        self.__rerun_button.setEnabled(flag)
 
     @Slot()
     def __ocr_from_file_handler(self) -> None:
@@ -110,13 +82,11 @@ class ControlView(QGroupBox):
 
     @Slot()
     def __rerun_handler(self) -> None:
-        if not self.__infer_view_model.available.get():
-            return
         self.__infer_view_model.infer()
 
     @Slot()
     def __paste_handler(self) -> None:
-        if not self.__infer_view_model.available.get():
+        if not is_backend_available(self.__infer_view_model.state.get()):
             return
         if self.__clipboard.mimeData().hasImage():
             image: QImage = self.__clipboard.image()

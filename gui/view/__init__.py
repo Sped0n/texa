@@ -1,12 +1,12 @@
 from PySide6.QtGui import QCloseEvent, QIcon
 from PySide6.QtWidgets import (
-    QGridLayout,
+    QHBoxLayout,
     QMainWindow,
     QMessageBox,
+    QVBoxLayout,
     QWidget,
 )
 
-from gui.view.config import ConfigView
 from gui.view.control import ControlView
 from gui.view.editor import EditorView
 from gui.view.paste import PasteView
@@ -30,7 +30,6 @@ class View(QMainWindow):
         self.__stausbar: StatusBarView = StatusBarView(
             view_model.infer_view_model, view_model.mdtex_view_model
         )
-        self.__config: ConfigView = ConfigView(view_model.infer_view_model)
 
         # setup
         self.setWindowTitle("Texa")
@@ -39,13 +38,15 @@ class View(QMainWindow):
         self.setWindowIcon(QIcon(":/images/icon"))
 
         # layout
-        layout: QGridLayout = QGridLayout()
-        layout.addWidget(self.__paste, 0, 0, 5, 3)
-        layout.addWidget(self.__render, 0, 3, 5, 3)
-        layout.addWidget(self.__control, 5, 0, 2, 2)
-        layout.addWidget(self.__config, 7, 0, 1, 2)
-        layout.addWidget(self.__editor, 5, 2, 3, 4)
-        layout.setVerticalSpacing(15)
+        upper_layout: QHBoxLayout = QHBoxLayout()
+        upper_layout.addWidget(self.__paste, 1)
+        upper_layout.addWidget(self.__render, 1)
+        lower_layout: QHBoxLayout = QHBoxLayout()
+        lower_layout.addWidget(self.__control, 1)
+        lower_layout.addWidget(self.__editor, 2)
+        layout: QVBoxLayout = QVBoxLayout()
+        layout.addLayout(upper_layout, 3)
+        layout.addLayout(lower_layout, 2)
         self.setCentralWidget(QWidget())
         self.centralWidget().setLayout(layout)
 
