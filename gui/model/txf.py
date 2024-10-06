@@ -1,4 +1,5 @@
 from functools import partial
+from pathlib import Path
 from queue import Empty, Queue
 from threading import Event
 
@@ -7,6 +8,7 @@ from optimum.pipelines import pipeline  # pyright: ignore[reportUnknownVariableT
 from PIL import ImageQt
 from PySide6.QtCore import (
     QObject,
+    QStandardPaths,
     QThread,
     Signal,
     Slot,
@@ -40,7 +42,14 @@ class _TxfWroker(QObject):
         initialized: bool = False
         try:
             model = ORTModelForVision2Seq.from_pretrained(
-                "Spedon/texify-quantized-onnx"
+                "Spedon/texify-quantized-onnx",
+                cache_dir=str(
+                    Path(
+                        QStandardPaths.standardLocations(
+                            QStandardPaths.StandardLocation.AppDataLocation
+                        )[0]
+                    ).joinpath("hf")
+                ),
             )
             texify = pipeline(
                 "image-to-text",
