@@ -39,7 +39,6 @@ class _TxfWroker(QObject):
 
     def run(self) -> None:
         # init
-        initialized: bool = False
         try:
             model = ORTModelForVision2Seq.from_pretrained(
                 "Spedon/texify-quantized-onnx",
@@ -50,6 +49,7 @@ class _TxfWroker(QObject):
                         )[0]
                     ).joinpath("hf")
                 ),
+                use_io_binding=True,
             )
             texify = pipeline(
                 "image-to-text",
@@ -57,13 +57,10 @@ class _TxfWroker(QObject):
                 feature_extractor="Spedon/texify-quantized-onnx",
                 image_processor="Spedon/texify-quantized-onnx",
             )
-            initialized = True
             self.loaded.emit(Ok(None))
         except Exception as e:
             self.loaded.emit(Err(str(e)))
-        finally:
-            if not initialized:
-                return
+            return None
 
         # inference loop
         while not self.__stop.wait(0.1):
