@@ -1,3 +1,4 @@
+import re
 from typing import Literal
 
 from PySide6.QtGui import QIcon
@@ -10,6 +11,17 @@ AppState = Literal[
 
 def is_backend_available(state: AppState) -> bool:
     return state == "Ready" or state == "Inference failed"
+
+
+def replace_double_dollar(text: str) -> str:
+    lines = text.split("\n")
+
+    processed_lines: list[str] = []
+    for line in lines:
+        processed_line = re.sub(r"\$\$ \$\$", "$$\n\n$$", line)
+        processed_lines.append(processed_line)
+
+    return "\n".join(processed_lines)
 
 
 class WarnMessageBox(QMessageBox):

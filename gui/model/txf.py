@@ -16,6 +16,8 @@ from PySide6.QtCore import (
 from PySide6.QtGui import QImage
 from result import Err, Ok, Result
 
+from gui.utils import replace_double_dollar
+
 
 class _TxfWroker(QObject):
     input: Signal = Signal(QImage)
@@ -71,7 +73,7 @@ class _TxfWroker(QObject):
             try:
                 image = ImageQt.fromqimage(data).convert("RGB")
                 result: str = texify(image, max_new_tokens=768)[0]["generated_text"]  # pyright: ignore[reportIndexIssue,reportOptionalSubscript,reportArgumentType,reportAssignmentType,reportPossiblyUnboundVariable]
-                self.output.emit(Ok(result))
+                self.output.emit(Ok(replace_double_dollar(result)))
             except Exception as e:
                 self.output.emit(Err(str(e)))
 
