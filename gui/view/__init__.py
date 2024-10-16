@@ -1,12 +1,24 @@
-from PySide6.QtGui import QCloseEvent, QIcon
+from PySide6.QtCore import QMimeData, Qt
+from PySide6.QtGui import (
+    QCloseEvent,
+    QDragEnterEvent,
+    QDragLeaveEvent,
+    QDragMoveEvent,
+    QDropEvent,
+    QIcon,
+    QImage,
+    QResizeEvent,
+)
 from PySide6.QtWidgets import (
     QHBoxLayout,
+    QLabel,
     QMainWindow,
     QMessageBox,
     QVBoxLayout,
     QWidget,
 )
 
+from gui.utils import is_backend_available
 from gui.view.control import ControlView
 from gui.view.editor import EditorView
 from gui.view.paste import PasteView
@@ -20,6 +32,9 @@ class View(QMainWindow):
         # super init
         super().__init__()
 
+        # references
+        self.__infer_view_model = view_model.infer_view_model
+
         # components
         self.__paste: PasteView = PasteView(view_model.infer_view_model)
         self.__render: RenderView = RenderView(view_model.mdtex_view_model)
@@ -30,6 +45,17 @@ class View(QMainWindow):
         self.__stausbar: StatusBarView = StatusBarView(
             view_model.infer_view_model, view_model.mdtex_view_model
         )
+
+        self.__overlay = QLabel(self)
+        self.__overlay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.__overlay.setText("Drop image here")
+        self.__overlay.setStyleSheet("""
+            background-color: rgba(50, 50, 50, 100);
+            color: rgb(120, 120, 120);
+            font-size: 36px;
+            border: 4px dashed white;
+        """)
+        self.__overlay.hide()
 
         # setup
         self.setWindowTitle("Texa")
@@ -50,6 +76,24 @@ class View(QMainWindow):
         self.setCentralWidget(QWidget())
         self.centralWidget().setLayout(layout)
 
+    def __is_mime_image(self, source: QMimeData) -> bool:
+        image: QImage | None = None
+
+        if source.hasUrls():
+            url = source.urls()[0]
+            if url.isLocalFile() and url.toLocalFile().lower().endswith(
+                (".png", ".jpg", ".jpeg")
+            ):
+                image = QImage(url.toLocalFile())
+
+        elif source.hasImage():
+            image = QImage(source.imageData())
+
+        if image is not None and not image.isNull():
+            return True
+        else:
+            return False
+
     def closeEvent(self, event: QCloseEvent) -> None:  # noqa: N802
         confirmation: QMessageBox = QMessageBox()
         confirmation.setText("Confirmation")
@@ -67,3 +111,53 @@ class View(QMainWindow):
             event.accept()
         else:
             event.ignore()
+
+    def resizeEvent(self, event: QResizeEvent) -> None:  # noqa: N802
+        super().resizeEvent(event)
+        self.__overlay.resize(self.size())
+
+    def dragEnterEvent(self, event: QDragEnterEvent) -> None:  # noqa: N802
+        if self.__is_mime_image(event.mimeData()):
+            self.__overlay.resize(self.size())
+            self.setEnabled(False)
+            self.__overlay.show()
+            event.setDropAction(Qt.DropAction.CopyAction)
+            event.accept()
+        else:
+            event.ignore()
+
+    def dragLeaveEvent(self, event: QDragLeaveEvent) -> None:  # noqa: N802
+        self.setEnabled(True)
+        self.__overlay.hide()
+
+    def dragMoveEvent(self, event: QDragMoveEvent) -> None:  # noqa: N802
+        if self.__is_mime_image(event.mimeData()):
+            event.setDropAction(Qt.DropAction.CopyAction)
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event: QDropEvent) -> None:  # noqa: N802
+        if not is_backend_available(self.__infer_view_model.state.get()):
+            self.__overlay.hide()
+            event.ignore()
+            return
+
+        source = event.mimeData()
+        if not self.__is_mime_image(source):
+            self.__overlay.hide()
+            event.ignore()
+            return
+
+        image: QImage
+        if source.hasUrls():
+            image = QImage(source.urls()[0].toLocalFile())
+        else:
+            image = QImage(source.imageData())
+
+        self.setEnabled(True)
+        self.__overlay.hide()
+        event.setDropAction(Qt.DropAction.CopyAction)
+        event.accept()
+        self.__infer_view_model.set_image(image)
+        self.__infer_view_model.infer()

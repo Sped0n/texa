@@ -88,9 +88,19 @@ class ControlView(QGroupBox):
     def __paste_handler(self) -> None:
         if not is_backend_available(self.__infer_view_model.state.get()):
             return
-        if self.__clipboard.mimeData().hasImage():
-            image: QImage = self.__clipboard.image()
-            if image.isNull():
-                return
+
+        image: QImage | None = None
+        source = self.__clipboard.mimeData()
+
+        if source.hasUrls():
+            url = source.urls()[0]
+            if url.isLocalFile() and url.toLocalFile().lower().endswith(
+                (".png", ".jpg", ".jpeg")
+            ):
+                image = QImage(url.toLocalFile())
+        elif source.hasImage():
+            image = QImage(source.imageData())
+
+        if image is not None and not image.isNull():
             self.__infer_view_model.set_image(image)
             self.__infer_view_model.infer()

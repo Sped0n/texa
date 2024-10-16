@@ -1,5 +1,11 @@
 from PySide6.QtCore import QMimeData, QTimer, Signal, Slot
-from PySide6.QtGui import QClipboard, QImage
+from PySide6.QtGui import (
+    QClipboard,
+    QDragEnterEvent,
+    QDragMoveEvent,
+    QDropEvent,
+    QImage,
+)
 from PySide6.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
@@ -18,13 +24,29 @@ class _TextEdit(QTextEdit):
     paste_image: Signal = Signal(QImage)
 
     def insertFromMimeData(self, source: QMimeData):  # noqa: N802
-        if source.hasImage():
+        image: QImage | None = None
+
+        if source.hasUrls():
+            url = source.urls()[0]
+            if url.isLocalFile() and url.toLocalFile().lower().endswith(
+                (".png", ".jpg", ".jpeg")
+            ):
+                image = QImage(url.toLocalFile())
+        elif source.hasImage():
             image = QImage(source.imageData())
-            if image.isNull():
-                return
+        if image is not None and not image.isNull():
             self.paste_image.emit(image)
         else:
             super().insertFromMimeData(source)
+
+    def dragEnterEvent(self, e: QDragEnterEvent) -> None:  # noqa: N802
+        e.ignore()
+
+    def dragMoveEvent(self, e: QDragMoveEvent) -> None:  # noqa: N802
+        e.ignore()
+
+    def dropEvent(self, e: QDropEvent) -> None:  # noqa: N802
+        e.ignore()
 
 
 class EditorView(QGroupBox):

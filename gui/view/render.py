@@ -1,9 +1,21 @@
 from markdown import Markdown
 from PySide6.QtCore import Slot
+from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QGroupBox, QVBoxLayout, QWidget
 
 from gui.viewmodel.mdtex import MDTeXViewModel
+
+
+class _WebView(QWebEngineView):
+    def dragEnterEvent(self, e: QDragEnterEvent) -> None:  # noqa: N802
+        e.ignore()
+
+    def dragMoveEvent(self, e: QDragMoveEvent) -> None:  # noqa: N802
+        e.ignore()
+
+    def dropEvent(self, e: QDropEvent) -> None:  # noqa: N802
+        e.ignore()
 
 
 class RenderView(QGroupBox):
@@ -20,7 +32,7 @@ class RenderView(QGroupBox):
         self.__converter: Markdown = Markdown(extensions=["pymdownx.arithmatex"])
 
         # widgets
-        self.__webview: QWebEngineView = QWebEngineView()
+        self.__webview: _WebView = _WebView()
 
         # effects
         self.__mdtex_view_model.markdown.connect(self.__markdown_handler)
