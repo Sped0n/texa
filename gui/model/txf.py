@@ -3,10 +3,13 @@ from pathlib import Path
 from queue import Empty, Queue
 from threading import Event
 
-from optimum.onnxruntime import ORTModelForVision2Seq
-from optimum.pipelines import pipeline  # pyright: ignore[reportUnknownVariableType]
+from huggingface_hub import (
+    hf_hub_download,  # pyright: ignore[reportUnknownVariableType]
+)
 from PIL import ImageQt
 from PySide6.QtCore import (
+    QDir,
+    QFile,
     QObject,
     QStandardPaths,
     QThread,
@@ -15,8 +18,12 @@ from PySide6.QtCore import (
 )
 from PySide6.QtGui import QImage
 from result import Err, Ok, Result
+from texifast.model import TxfModel as TexifastModel
+from texifast.pipeline import TxfPipeline as TexifastPipeline
 
-from gui.utils import replace_double_dollar
+ENCODER_MODEL_NAME = "encoder_model_quantized.onnx"
+DECODER_MODEL_NAME = "decoder_model_merged_quantized.onnx"
+TOKENIZER_JSON_NAME = "tokenizer.json"
 
 
 class _TxfWroker(QObject):
@@ -31,6 +38,23 @@ class _TxfWroker(QObject):
         # variables
         self.__stop: Event = Event()
         self.__queue: Queue[QImage] = Queue(3)
+        self.__texifast_path: Path = Path(
+            QStandardPaths.standardLocations(
+                QStandardPaths.StandardLocation.AppDataLocation
+            )[0]
+        ).joinpath("texifast")
+        qd = QDir()
+        if not qd.exists(str(self.__texifast_path)):
+            qd.mkpath(str(self.__texifast_path))
+        self.__encoder_model_path_str = str(
+            self.__texifast_path.joinpath(ENCODER_MODEL_NAME)
+        )
+        self.__decoder_model_path_str: str = str(
+            self.__texifast_path.joinpath(DECODER_MODEL_NAME)
+        )
+        self.__tokenizer_json_path_str: str = str(
+            self.__texifast_path.joinpath(TOKENIZER_JSON_NAME)
+        )
 
         # effects
         self.__input_conn = self.input.connect(partial(self.__input_handler))
@@ -39,26 +63,47 @@ class _TxfWroker(QObject):
     def __input_handler(self, data: QImage) -> None:
         self.__queue.put(data)
 
+    def __prepare_model(self) -> None:
+        temp_location_str = QStandardPaths.standardLocations(
+            QStandardPaths.StandardLocation.TempLocation
+        )[0]
+        qf = QFile()
+        if not qf.exists(self.__encoder_model_path_str):
+            hf_hub_download(
+                "Spedon/texify-quantized-onnx",
+                filename=ENCODER_MODEL_NAME,
+                local_dir=temp_location_str,
+            )
+            f = QFile(str(Path(temp_location_str).joinpath(ENCODER_MODEL_NAME)))
+            f.copy(self.__encoder_model_path_str)
+            f.remove()
+        if not qf.exists(self.__decoder_model_path_str):
+            hf_hub_download(
+                "Spedon/texify-quantized-onnx",
+                filename=DECODER_MODEL_NAME,
+                local_dir=temp_location_str,
+            )
+            f = QFile(str(Path(temp_location_str).joinpath(DECODER_MODEL_NAME)))
+            f.copy(self.__decoder_model_path_str)
+            f.remove()
+        if not qf.exists(self.__tokenizer_json_path_str):
+            hf_hub_download(
+                "Spedon/texify-quantized-onnx",
+                filename=TOKENIZER_JSON_NAME,
+                local_dir=temp_location_str,
+            )
+            f = QFile(str(Path(temp_location_str).joinpath(TOKENIZER_JSON_NAME)))
+            f.copy(self.__tokenizer_json_path_str)
+            f.remove()
+
     def run(self) -> None:
         # init
         try:
-            model = ORTModelForVision2Seq.from_pretrained(
-                "Spedon/texify-quantized-onnx",
-                cache_dir=str(
-                    Path(
-                        QStandardPaths.standardLocations(
-                            QStandardPaths.StandardLocation.AppDataLocation
-                        )[0]
-                    ).joinpath("hf")
-                ),
-                use_io_binding=True,
+            self.__prepare_model()
+            model = TexifastModel(
+                self.__encoder_model_path_str, self.__decoder_model_path_str
             )
-            texify = pipeline(
-                "image-to-text",
-                model,
-                feature_extractor="Spedon/texify-quantized-onnx",
-                image_processor="Spedon/texify-quantized-onnx",
-            )
+            texifast = TexifastPipeline(model, self.__tokenizer_json_path_str)
             self.loaded.emit(Ok(None))
         except Exception as e:
             self.loaded.emit(Err(str(e)))
@@ -72,8 +117,8 @@ class _TxfWroker(QObject):
                 continue
             try:
                 image = ImageQt.fromqimage(data).convert("RGB")
-                result: str = texify(image, max_new_tokens=768)[0]["generated_text"]  # pyright: ignore[reportIndexIssue,reportOptionalSubscript,reportArgumentType,reportAssignmentType,reportPossiblyUnboundVariable]
-                self.output.emit(Ok(replace_double_dollar(result)))
+                result: str = texifast(image, max_new_tokens=768, refine_output=True)
+                self.output.emit(Ok(result))
             except Exception as e:
                 self.output.emit(Err(str(e)))
 
