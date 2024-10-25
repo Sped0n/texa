@@ -79,6 +79,7 @@ const Editor = () => {
 					class="no-scrollbar w-full h-full resize-none py-4 pr-6 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-blue-300 focus:border-blue-300"
 					placeholder="Start typing..."
 					value={content()}
+					spellcheck={false}
 					onInput={(e) => setContent(e.currentTarget.value)}
 					onWheel={(e) => e.stopPropagation()}
 					onTouchMove={(e) => e.stopPropagation()}
