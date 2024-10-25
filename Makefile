@@ -1,5 +1,19 @@
-qrc:
-	pyside6-rcc gui.assets/resources.qrc -o gui/resources.py
+nuitka: texa.py
+	cd frontend && pnpm run build && cd .. && \
+	python -m nuitka texa.py \
+    --include-package-data=webview \
+		--include-data-dir=./artifacts=artifacts \
+		--macos-create-app-bundle \
+		--macos-app-version=1.0.3 \
+		--macos-app-icon=./assets/icon.png \
+		--output-filename=texa \
+		--standalone \
+		--deployment \
+		--product-name=Texa \
+		--file-version=1.0.3 \
+		--product-version=1.0.3 \
+		--file-description="Easy LaTeX and markdown OCR" \
+		--show-progress \
 
 pyinstaller:
-	pyinstaller --windowed --noconfirm --icon=gui.assets/icon.png --collect-submodules=pymdownx.arithmatex --name=Texa --optimize=1 --collect-data=ultralytics --collect-data=cnocr --collect-data=spellchecker gui/__main__.py
+	pyinstaller --windowed --noconfirm --icon=assets/icon.png --name=Texa --add-data=artifacts:artifacts --optimize=1 texa.py
