@@ -62,16 +62,20 @@ const MidStatus = (): JSXElement => {
 	return (
 		<div ref={statusRef} class="status text-center flex-1 relative">
 			{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-			<span
-				class={`font-normal ${hasError() ? "text-red-500 cursor-pointer" : ""}`}
+			<div
+				class={`font-normal flex justify-center items-center ${hasError() ? "text-red-500 cursor-pointer" : ""}`}
 				onClick={togglePopover}
 			>
-				{globalState()}
-				{hasError() && <Icon icon="line-md:alert" inline class="ml-1" />}
+				<span class="inline">{globalState()}</span>
+				{hasError() && <Icon icon="line-md:alert" inline class="ml-1 mb-0.5" />}
 				{hasIng() && (
-					<Icon icon="line-md:loading-twotone-loop" inline class="ml-1" />
+					<Icon
+						icon="line-md:loading-twotone-loop"
+						inline
+						class="ml-1 mb-0.5"
+					/>
 				)}
-			</span>
+			</div>
 			{hasError() && showPopover() && (
 				<div
 					ref={popoverRef}
@@ -82,10 +86,10 @@ const MidStatus = (): JSXElement => {
 					<div class="mb-2">click to copy error message</div>
 					{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
 					<div
-						class="text-wrap text-red-500 border border-red-200 p-2 rounded bg-red-200 cursor-pointer"
+						class="text-wrap underline text-red-500 border border-red-200 p-2 rounded bg-red-200 cursor-pointer"
 						onClick={async () => await navigator.clipboard.writeText(errMsg())}
 					>
-						<u>{errMsg()}</u>
+						{errMsg()}
 					</div>
 				</div>
 			)}

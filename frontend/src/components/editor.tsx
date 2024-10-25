@@ -76,7 +76,7 @@ const Editor = () => {
 			<div class="h-full w-14 relative pywebview-drag-region" />
 			<div class="h-full relative grow">
 				<textarea
-					class="no-scrollbar w-full h-full resize-none py-4 pr-6 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-blue-300"
+					class="no-scrollbar w-full h-full bg-white resize-none py-4 pr-6 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
 					placeholder="Start typing..."
 					value={content()}
 					spellcheck={false}
@@ -87,7 +87,7 @@ const Editor = () => {
 				<button
 					type="button"
 					onClick={copied() ? undefined : copyContent}
-					class="absolute top-3 right-3 py-1 px-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100"
+					class="absolute top-3 right-3 p-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100"
 					title="Copy to clipboard"
 				>
 					<Show

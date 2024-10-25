@@ -11,10 +11,10 @@ const RightButtons = (): JSXElement => {
 	};
 
 	return (
-		<div class="flex items-center space-x-2 flex-1 justify-end">
+		<div class="flex mb-1 items-center space-x-2 flex-1 justify-end">
 			<button
 				type="button"
-				class="px-1 pt-1 mb-1 hover:bg-gray-200 rounded"
+				class="p-1 hover:bg-gray-200 rounded"
 				onClick={minimizeHandler}
 			>
 				<Icon
@@ -26,7 +26,7 @@ const RightButtons = (): JSXElement => {
 			</button>
 			<button
 				type="button"
-				class="px-1 pt-1 mb-1 text-red-600 hover:bg-gray-200 rounded"
+				class="p-1 text-red-600 hover:bg-gray-200 rounded"
 				onClick={quitHandler}
 			>
 				<Icon

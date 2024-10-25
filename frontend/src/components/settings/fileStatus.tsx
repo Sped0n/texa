@@ -134,7 +134,7 @@ export const FileStatus = (props: FileStatusProps): JSXElement => {
 				onTouchStart={startRemoveAnimation}
 				onTouchEnd={cancelRemoveAnimation}
 				class={`
-          w-14 py-1 text-xs rounded-md border relative bg-white text-black border-gray-300
+          w-14 py-1 text-xs rounded-md border relative bg-white text-black text-center border-gray-300
           ${isDownloading() ? "cursor-not-allowed bg-gray-100 text-gray-400" : ""}
         `}
 				style={{

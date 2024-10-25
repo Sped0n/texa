@@ -57,10 +57,10 @@ const LeftButtons = (): JSXElement => {
 	};
 
 	return (
-		<div class="flex items-center space-x-2 flex-1">
+		<div class="flex items-center mb-1 space-x-2 flex-1">
 			<button
 				type="button"
-				class={`px-1 pt-1 mb-1 rounded ${runnable() ? "hover:bg-gray-200" : "text-gray-400"}`}
+				class={`p-1 rounded ${runnable() ? "hover:bg-gray-200" : "text-gray-400"}`}
 				onClick={uploadHandler}
 				disabled={!runnable()}
 			>
@@ -73,7 +73,7 @@ const LeftButtons = (): JSXElement => {
 			</button>
 			<button
 				type="button"
-				class={`px-1 pt-1 mb-1 rounded ${rerunnable() ? "hover:bg-gray-200" : "text-gray-400"}`}
+				class={`p-1 rounded ${rerunnable() ? "hover:bg-gray-200" : "text-gray-400"}`}
 				onClick={rerunHandler}
 				disabled={!rerunnable()}
 			>
@@ -86,7 +86,7 @@ const LeftButtons = (): JSXElement => {
 			</button>
 			<button
 				type="button"
-				class={`px-1 pt-1 mb-1 rounded ${rerunnable() ? "hover:bg-gray-200" : "text-gray-400"}`}
+				class={`p-1 rounded ${rerunnable() ? "hover:bg-gray-200" : "text-gray-400"}`}
 				onClick={clearHandler}
 				disabled={!rerunnable()}
 			>
@@ -99,7 +99,7 @@ const LeftButtons = (): JSXElement => {
 			</button>
 			<button
 				type="button"
-				class={`px-1 pt-1 mb-1 rounded ${settingsUsable() ? "hover:bg-gray-200" : "text-gray-400"}`}
+				class={`p-1 rounded ${settingsUsable() ? "hover:bg-gray-200" : "text-gray-400"}`}
 				onClick={() => setIsSettingsOpen(true)}
 				disabled={!settingsUsable()}
 			>
