@@ -19,7 +19,7 @@ if __name__ == "__main__":
         "Texa",
         "./artifacts/index.html",
         js_api=api,
-        width=900,
+        width=850,
         height=700,
         min_size=(600, 500),
         easy_drag=False,

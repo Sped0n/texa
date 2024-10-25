@@ -19,7 +19,7 @@ if __name__ == "__main__":
         "Texa",
         "http://localhost:3000",
         js_api=api,
-        width=900,
+        width=850,
         height=700,
         min_size=(600, 500),
         easy_drag=False,
