@@ -1,0 +1,5 @@
+*.html linguist-vendored
+*.js linguist-vendored
+*.json linguist-vendored
+*.ps1 linguist-vendored
+*.sh linguist-vendored
