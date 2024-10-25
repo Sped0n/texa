@@ -82,7 +82,6 @@ const Editor = () => {
 					onInput={(e) => setContent(e.currentTarget.value)}
 					onWheel={(e) => e.stopPropagation()}
 					onTouchMove={(e) => e.stopPropagation()}
-					onPaste={(e) => e.stopPropagation()}
 				/>
 				<button
 					type="button"

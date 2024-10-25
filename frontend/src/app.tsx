@@ -51,14 +51,23 @@ const App = () => {
 	};
 
 	const pasteHandler = async (e: ClipboardEvent) => {
-		e.preventDefault();
-		if (e.clipboardData === null) return;
-		if (!runnable()) return;
-
-		for (const file of e.clipboardData.files) {
-			if (!file.type.startsWith("image/")) continue;
-			await handleFile(file);
-			break;
+		const isTextArea = e.target instanceof HTMLTextAreaElement;
+		const files = e.clipboardData?.files;
+		const hasImage = Array.from(files || []).some((item) =>
+			item.type.startsWith("image/"),
+		);
+		if (hasImage) {
+			e.preventDefault();
+			if (!runnable()) return;
+			if (!files) return;
+			for (const file of files) {
+				if (!file.type.startsWith("image/")) continue;
+				await handleFile(file);
+				return;
+			}
+		} else if (!isTextArea) {
+			e.preventDefault();
+			return;
 		}
 	};
 
