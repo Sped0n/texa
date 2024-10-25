@@ -17,7 +17,7 @@ if __name__ == "__main__":
     api = API()
     window = webview.create_window(
         "Texa",
-        "./artifacts/index.html",
+        "http://localhost:3000",
         js_api=api,
         width=900,
         height=700,
@@ -27,4 +27,5 @@ if __name__ == "__main__":
     )
     window.events.closing += api.on_closing
     api.bind_window(window)
-    webview.start()
+    webview.start(debug=True)
+    exit(0)
