@@ -71,6 +71,8 @@ class API:
             if isinstance(result, Ok):
                 return PyResponse("ok", result.value)
             else:
+                self.__worker.join()
+                self.__worker = None
                 return PyResponse("err", result.value)
         else:
             return PyResponse(
