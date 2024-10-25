@@ -71,7 +71,7 @@ const App = () => {
 		}
 	};
 
-	const dragEnterHandler = (e: DragEvent) => {
+	const dragEnterOverHandler = (e: DragEvent) => {
 		e.preventDefault();
 		setIsDragging(true);
 	};
@@ -79,11 +79,6 @@ const App = () => {
 	const dragLeaveHandler = (e: DragEvent) => {
 		e.preventDefault();
 		setIsDragging(false);
-	};
-
-	const dragOverHandler = (e: DragEvent) => {
-		e.preventDefault();
-		setIsDragging(true);
 	};
 
 	const dropHandler = async (e: DragEvent) => {
@@ -142,14 +137,14 @@ const App = () => {
 	return (
 		<div
 			class="h-fit min-h-screen bg-gray-100 font-sans font-medium flex flex-col relative"
-			onDragEnter={dragEnterHandler}
+			onDragEnter={dragEnterOverHandler}
 			onDragLeave={dragLeaveHandler}
-			onDragOver={dragOverHandler}
+			onDragOver={dragEnterOverHandler}
 			onDrop={dropHandler}
 		>
 			<Show when={dragEnabled()}>
-				<div class="absolute inset-0 bg-blue-900 bg-opacity-75 flex items-center border-dashed border-white border-4 rounded-lg justify-center z-10 pointer-events-none">
-					<p class="text-white font-bold text-3xl">Drop image here</p>
+				<div class="absolute inset-0 bg-blue-900 bg-opacity-80 flex items-center border-dashed border-white border-4 rounded-lg justify-center z-10 pointer-events-none">
+					<p class="text-white font-bold text-5xl">Drop image here..</p>
 				</div>
 			</Show>
 			<TopBar />
