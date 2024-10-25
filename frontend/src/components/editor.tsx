@@ -76,7 +76,7 @@ const Editor = () => {
 			<div class="h-full w-14 relative pywebview-drag-region" />
 			<div class="h-full relative grow">
 				<textarea
-					class="no-scrollbar w-full h-full bg-white resize-none py-4 pr-6 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+					class="no-scrollbar break-words w-full h-full bg-white resize-none py-4 pr-6 pl-4 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
 					placeholder="Start typing..."
 					value={content()}
 					spellcheck={false}
