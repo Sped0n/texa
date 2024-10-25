@@ -1,7 +1,11 @@
 import { Icon } from "@iconify-icon/solid";
-import { gsap } from "gsap";
-import { type Accessor, type JSXElement, createSignal } from "solid-js";
-import invariant from "tiny-invariant";
+import type { gsap as gsapType } from "gsap";
+import {
+	type Accessor,
+	type JSXElement,
+	createSignal,
+	onMount,
+} from "solid-js";
 
 import {
 	$globalState,
@@ -11,6 +15,7 @@ import {
 } from "../../stores/states";
 
 import { useStore } from "@nanostores/solid";
+import invariant from "tiny-invariant";
 import { nameToFileType } from "../../helpers";
 import { setErrMsg } from "../../stores/msg";
 
@@ -26,6 +31,8 @@ export const FileStatus = (props: FileStatusProps): JSXElement => {
 	const [isPressed, setIsPressed] = createSignal(false);
 	const globalState = useStore($globalState);
 	const isDownloading = useStore($isDownloading);
+
+	let gsap: typeof gsapType | undefined = undefined;
 
 	const importHandler = async () => {
 		if (isPressed()) {
@@ -66,9 +73,7 @@ export const FileStatus = (props: FileStatusProps): JSXElement => {
 	};
 
 	const startRemoveAnimation = () => {
-		if (!props.isImported()) return;
-		invariant(buttonRef, "buttonRef is not defined");
-
+		if (!props.isImported() || !buttonRef || !gsap) return;
 		setIsPressed(true);
 		gsap.set(buttonRef, { "--progress": "0%" });
 		gsap.to(buttonRef, {
@@ -77,6 +82,7 @@ export const FileStatus = (props: FileStatusProps): JSXElement => {
 			ease: "linear",
 			onComplete: () => {
 				removeHandler().then(() => {
+					if (!gsap) return;
 					gsap.set(buttonRef, { "--progress": "0%" });
 				});
 			},
@@ -84,12 +90,16 @@ export const FileStatus = (props: FileStatusProps): JSXElement => {
 	};
 
 	const cancelRemoveAnimation = () => {
-		if (!props.isImported()) return;
-		invariant(buttonRef, "buttonRef is not defined");
+		if (!props.isImported() || !buttonRef || !gsap) return;
 		setIsPressed(false);
 		gsap.killTweensOf(buttonRef);
 		gsap.set(buttonRef, { "--progress": "0%" });
 	};
+
+	onMount(async () => {
+		gsap = await import("gsap").then((module) => module.gsap);
+		invariant(gsap, "gsap is not defined");
+	});
 
 	return (
 		<div class="flex items-center justify-between p-2">

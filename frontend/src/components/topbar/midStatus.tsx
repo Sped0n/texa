@@ -1,6 +1,6 @@
 import { Icon } from "@iconify-icon/solid";
 import { useStore } from "@nanostores/solid";
-import gsap from "gsap";
+import type { gsap as gsapType } from "gsap";
 import { type JSXElement, createMemo, createSignal, onMount } from "solid-js";
 import invariant from "tiny-invariant";
 
@@ -15,7 +15,7 @@ const MidStatus = (): JSXElement => {
 	const [showPopover, setShowPopover] = createSignal(false);
 	const errMsg = useStore($errMsg);
 
-	const controller = new AbortController();
+	let gsap: typeof gsapType | undefined = undefined;
 
 	const handleClickOutside = (event: MouseEvent) => {
 		if (popoverRef && !popoverRef.contains(event.target as Node)) {
@@ -34,10 +34,9 @@ const MidStatus = (): JSXElement => {
 	});
 
 	const togglePopover = (event: MouseEvent) => {
-		if (!hasError()) return;
+		if (!hasError() || !gsap) return;
 		event.stopPropagation();
 		setShowPopover(!showPopover());
-		console.log("togglePopover");
 		invariant(popoverRef, "popoverRef is not defined");
 		if (!showPopover()) {
 			gsap.to(popoverRef, {
@@ -55,7 +54,8 @@ const MidStatus = (): JSXElement => {
 		}
 	};
 
-	onMount(() => {
+	onMount(async () => {
+		gsap = await import("gsap").then((module) => module.gsap);
 		window.addEventListener("click", handleClickOutside);
 	});
 

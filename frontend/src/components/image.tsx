@@ -1,6 +1,6 @@
 import { Icon } from "@iconify-icon/solid";
 import { useStore } from "@nanostores/solid";
-import gsap from "gsap";
+import type { gsap as gsapType } from "gsap";
 import { type JSXElement, Show, createEffect, on, onMount } from "solid-js";
 import invariant from "tiny-invariant";
 
@@ -16,8 +16,12 @@ const Image = (): JSXElement => {
 	const imageDataUrl = useStore($imageDataUrl);
 	const isImageUndefined = useStore($isImageUndefined);
 
-	onMount(() => {
+	let gsap: typeof gsapType | undefined = undefined;
+
+	onMount(async () => {
 		invariant(containerRef, "containerRef is not defined");
+		gsap = await import("gsap").then((module) => module.gsap);
+		invariant(gsap, "gsap is not defined");
 		gsap.set(containerRef, {
 			height: hideOriginal() ? "44px" : `${Math.floor((vhpx() - 44) * 0.4)}px`,
 		});
@@ -27,7 +31,7 @@ const Image = (): JSXElement => {
 		on(
 			() => vhpx(),
 			() => {
-				invariant(containerRef, "containerRef is not defined");
+				if (!containerRef || !gsap) return;
 				gsap.set(containerRef, {
 					height: hideOriginal()
 						? "44px"
@@ -42,7 +46,7 @@ const Image = (): JSXElement => {
 		on(
 			() => hideOriginal(),
 			() => {
-				invariant(containerRef, "containerRef is not defined");
+				if (!containerRef || !gsap) return;
 				gsap.to(containerRef, {
 					height: hideOriginal()
 						? "44px"

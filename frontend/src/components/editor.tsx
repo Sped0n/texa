@@ -1,6 +1,6 @@
 import { Icon } from "@iconify-icon/solid";
 import { useStore } from "@nanostores/solid";
-import gsap from "gsap";
+import type { gsap as gsapType } from "gsap";
 import { Show, createEffect, createSignal, on, onMount } from "solid-js";
 import invariant from "tiny-invariant";
 
@@ -16,6 +16,8 @@ const Editor = () => {
 	const vhpx = useStore($vhpx);
 	const content = useStore($content);
 
+	let gsap: typeof gsapType | undefined = undefined;
+
 	const copyContent = async () => {
 		try {
 			await navigator.clipboard.writeText(content());
@@ -26,8 +28,10 @@ const Editor = () => {
 		}
 	};
 
-	onMount(() => {
+	onMount(async () => {
 		invariant(containerRef, "containerRef is not defined");
+		gsap = await import("gsap").then((module) => module.gsap);
+		invariant(gsap, "gsap is not defined");
 		gsap.set(containerRef, {
 			height: hide()
 				? `${Math.floor((vhpx() - 88) * 0.4)}px`
@@ -39,7 +43,7 @@ const Editor = () => {
 		on(
 			() => vhpx(),
 			() => {
-				invariant(containerRef, "containerRef is not defined");
+				if (!containerRef || !gsap) return;
 				gsap.set(containerRef, {
 					height: hide()
 						? `${Math.floor((vhpx() - 88) * 0.4)}px`
@@ -54,7 +58,7 @@ const Editor = () => {
 		on(
 			() => hide(),
 			() => {
-				invariant(containerRef, "containerRef is not defined");
+				if (!containerRef || !gsap) return;
 				gsap.to(containerRef, {
 					height: hide()
 						? `${Math.floor((vhpx() - 88) * 0.4)}px`
@@ -78,6 +82,7 @@ const Editor = () => {
 					onInput={(e) => setContent(e.currentTarget.value)}
 					onWheel={(e) => e.stopPropagation()}
 					onTouchMove={(e) => e.stopPropagation()}
+					onPaste={(e) => e.stopPropagation()}
 				/>
 				<button
 					type="button"

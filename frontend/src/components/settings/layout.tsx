@@ -1,5 +1,5 @@
 import { useStore } from "@nanostores/solid";
-import { gsap } from "gsap";
+import type { gsap as gsapType } from "gsap";
 import { createEffect, createSignal, on, onMount } from "solid-js";
 import invariant from "tiny-invariant";
 
@@ -15,9 +15,10 @@ const Settings = () => {
 	const [isAnimating, setIsAnimating] = createSignal(false);
 	const isSettingsOpen = useStore($isSettingsOpen);
 
+	let gsap: typeof gsapType | undefined = undefined;
+
 	const animateIn = () => {
-		invariant(overlayRef, "overlayRef is not defined");
-		invariant(modalRef, "modalRef is not defined");
+		if (!modalRef || !overlayRef || !gsap) return;
 		setIsAnimating(true);
 		const tl = gsap.timeline();
 		tl.to(overlayRef, { opacity: 1, duration: 0.3, display: "flex" });
@@ -32,8 +33,7 @@ const Settings = () => {
 	};
 
 	const animateOut = () => {
-		invariant(modalRef, "modalRef is not defined");
-		invariant(overlayRef, "overlayRef is not defined");
+		if (!modalRef || !overlayRef || !gsap) return;
 		setIsAnimating(true);
 		const tl = gsap.timeline();
 		tl.to(modalRef, { scale: 0.8, opacity: 0, duration: 0.2 });
@@ -50,9 +50,11 @@ const Settings = () => {
 		}
 	};
 
-	onMount(() => {
+	onMount(async () => {
 		invariant(modalRef, "modalRef is not defined");
 		invariant(overlayRef, "overlayRef is not defined");
+		gsap = await import("gsap").then((module) => module.gsap);
+		invariant(gsap, "gsap is not defined");
 		gsap.set(modalRef, { scale: 0.8, opacity: 0 });
 		gsap.set(overlayRef, { opacity: 0, display: "none" });
 	});
